@@ -1,8 +1,18 @@
-import { Button, Card, CardContent, CircularProgress, Grid, Typography } from '@mui/material';
-import { apiUrl } from '../../constants';
-import { useAppDispatch, useAppSelector } from '../../App/hooks';
-import { selectUserImages, selectUserIsLoading } from './imageStorageSlice';
-import { useEffect } from 'react';
+import {
+    Button,
+    Card,
+    CardContent,
+    CardMedia,
+    CircularProgress, Dialog, DialogActions,
+    DialogContent,
+    Grid,
+    styled,
+    Typography
+} from '@mui/material';
+import {apiUrl} from '../../constants';
+import {useAppDispatch, useAppSelector} from '../../App/hooks';
+import {selectUserImages, selectUserIsLoading} from './imageStorageSlice';
+import {useEffect, useState} from 'react';
 import {deleteImages, getUserImages, getUsers, userDeleteImage} from './imageStorageThunks';
 import {selectUser, selectUsers, selectUsersLoading} from '../Users/usersSlice';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -17,6 +27,17 @@ const UserPhotos = () => {
     const users = useAppSelector(selectUsers);
     const usersIsLoading = useAppSelector(selectUsersLoading);
 
+    const [photosData, setPhotosData] = useState<null | string>(null);
+    const [dialog, setDialog] = useState(false);
+
+    const handleOpen = (photo: string) => {
+        setPhotosData(photo);
+        setDialog(true);
+    };
+
+    const handleClose = () => {
+        setDialog(false);
+    };
 
     useEffect(() => {
         const fetchUrl = async () => {
@@ -32,16 +53,21 @@ const UserPhotos = () => {
         if (params.id) await dispatch(getUserImages(params.id));
     };
 
-    const toForm = () => {
-        navigate('/addImage');
-    };
-
-    const getUserName = users.find(elem => elem._id === params.id);
-
     const userDeleteOnePhoto = async (id: string) => {
         await dispatch(userDeleteImage(id));
         if (params.id) await dispatch(getUserImages(params.id));
     };
+
+    const toForm = () => {
+        navigate('/addPhoto');
+    };
+
+    const ImageCardMedia = styled(CardMedia)({
+        height: 0,
+        paddingTop: '56.25%',
+    });
+
+    const getUserName = users.find(elem => elem._id === params.id);
 
     return (
         <>
@@ -50,16 +76,11 @@ const UserPhotos = () => {
             <Grid container spacing={3}>
                 {!isLoading ? userPhotos.map((elem) => (
                     <Grid item xs={3} key={elem._id}>
-                        <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ flex: 1, position: 'relative' }}>
-                                <img src={`${apiUrl}/${elem.image}`} alt={elem.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            </div>
+                        <Card onClick={() => handleOpen(elem.image)}>
+                            <ImageCardMedia image={`${apiUrl}/${elem.image}`}/>
                             <CardContent>
                                 <Typography component="div" variant="h6">
                                     {elem.title}
-                                </Typography>
-                                <Typography>
-                                    {elem.user.displayName}
                                 </Typography>
                                 {user && user._id === elem.user._id && <Typography component="div">
                                     <Button sx={{color: 'red'}} onClick={() => userDeleteOnePhoto(elem._id)}>Удалить</Button>
@@ -72,6 +93,15 @@ const UserPhotos = () => {
                     </Grid>
                 )) : <CircularProgress />}
             </Grid>
+
+            <Dialog open={dialog} onClose={handleClose}>
+                <DialogContent sx={{width: "400px", height: "auto"}}>
+                    <ImageCardMedia image={`${apiUrl}/${photosData}`} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

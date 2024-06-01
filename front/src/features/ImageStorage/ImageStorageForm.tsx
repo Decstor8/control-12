@@ -61,7 +61,7 @@ const ImagesStorageForm = () => {
                         <FileInput label="image" name="image" onChange={InputChangeHandler} />
                     </Grid>
                 </Grid>
-                <Button type="submit" disabled={active}>Добавить фото</Button>
+                <Button type="submit" disabled={active}>Add photo</Button>
             </Box>
         </>
     );

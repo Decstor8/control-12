@@ -1,26 +1,26 @@
 import {useAppDispatch, useAppSelector} from '../../App/hooks';
 import {selectIsLoading, selectImages} from './imageStorageSlice';
+import {selectUser} from '../Users/usersSlice';
 import {
     Button,
     Card,
     CardContent,
     CardMedia,
-    CircularProgress,
-    Dialog, DialogActions,
+    CircularProgress, Dialog, DialogActions,
     DialogContent,
     Grid,
+    styled,
     Typography
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import {apiUrl} from '../../constants';
 import {useEffect, useState} from 'react';
 import {deleteImages, getImages} from './imageStorageThunks';
-import {selectUser} from "../Users/usersSlice";
 
-const Images = () => {
+const Photos = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const images = useAppSelector(selectImages);
+    const photos = useAppSelector(selectImages);
     const isLoading = useAppSelector(selectIsLoading);
     const user = useAppSelector(selectUser);
 
@@ -45,35 +45,35 @@ const Images = () => {
     }, [dispatch]);
 
     const toProfile = (id: string) => {
-        navigate(`/images/${id}`);
+        navigate(`/photos/${id}`);
     };
 
-    const deleteOneImages = async (id: string) => {
+    const deleteOnePhoto = async (id: string) => {
         await dispatch(deleteImages(id));
         await dispatch(getImages());
     };
 
+    const ImageCardMedia = styled(CardMedia)({
+        height: 0,
+        paddingTop: '65.25%',
+    });
+
     return (
         <>
             <Grid container spacing={3}>
-                {!isLoading ? images.map((elem) => (
+                {!isLoading ? photos.map((elem) => (
                     <Grid item xs={3} key={elem._id}>
-                        <Card onClick={() => handleOpen(elem.image)} style={{ height: 0, paddingTop: '57%' }}>
-                            <CardMedia
-                                component="img"
-                                image={`${apiUrl}/${elem.image}`}
-                                title={elem.title}
-                                style={{ height: '100%', objectFit: 'cover' }}
-                            />
+                        <Card onClick={() => handleOpen(elem.image)}>
+                            <ImageCardMedia image={`${apiUrl}/${elem.image}`}/>
                             <CardContent>
                                 <Typography component="div" variant="h6">
                                     {elem.title}
                                 </Typography>
                                 <Typography component="div">
-                                    <div onClick={() => toProfile(elem.user?._id)}>By: {elem.user.displayName}</div>
+                                    <div onClick={() => toProfile(elem.user._id)}>By: {elem.user?.displayName}</div>
                                 </Typography>
                                 {user && user.role === 'admin' && <Typography component="div">
-                                    <Button sx={{color: 'red'}} onClick={() => deleteOneImages(elem._id)}>Удалить</Button>
+                                    <Button sx={{color: 'red'}} onClick={() => deleteOnePhoto(elem._id)}>Удалить</Button>
                                 </Typography>}
                             </CardContent>
                         </Card>
@@ -82,21 +82,15 @@ const Images = () => {
             </Grid>
 
             <Dialog open={dialog} onClose={handleClose}>
-                <DialogContent sx={{ width: '400px', height: 'auto' }}>
-                    <CardMedia
-                        component="img"
-                        image={`${apiUrl}/${photosData}`}
-                        sx={{ height: 0, paddingTop: '66%' }}
-                    />
+                <DialogContent sx={{width: "400px", height: "auto"}}>
+                    <ImageCardMedia image={`${apiUrl}/${photosData}`} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Close</Button>
                 </DialogActions>
             </Dialog>
-
         </>
-
     );
 };
 
-export default Images;
+export default Photos;
