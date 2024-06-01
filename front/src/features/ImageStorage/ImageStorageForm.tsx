@@ -12,6 +12,7 @@ const ImagesStorageForm = () => {
         image: '',
     });
 
+    const [active, setActive] = useState(true);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -30,6 +31,7 @@ const ImagesStorageForm = () => {
             setState((prevState) => ({
                 ...prevState, [name]: files[0]
             }));
+            setActive(false);
         }
     };
 
@@ -59,7 +61,7 @@ const ImagesStorageForm = () => {
                         <FileInput label="image" name="image" onChange={InputChangeHandler} />
                     </Grid>
                 </Grid>
-                <Button type="submit">Add photo</Button>
+                <Button type="submit" disabled={active}>Добавить фото</Button>
             </Box>
         </>
     );

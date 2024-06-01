@@ -32,6 +32,7 @@ const FileInput: React.FC<Props> = ({onChange, name, label}) => {
         <>
             <input
                 style={{display: 'none'}}
+                required
                 type="file"
                 name={name}
                 onChange={onFileChange}

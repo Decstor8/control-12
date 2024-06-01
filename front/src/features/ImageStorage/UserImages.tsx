@@ -3,29 +3,40 @@ import { apiUrl } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../App/hooks';
 import { selectUserImages, selectUserIsLoading } from './imageStorageSlice';
 import { useEffect } from 'react';
-import { deleteImages, getUserImages, userDeleteImage } from './imageStorageThunks';
-import { selectUser } from '../Users/usersSlice';
-import { useParams } from 'react-router-dom';
+import {deleteImages, getUserImages, getUsers, userDeleteImage} from './imageStorageThunks';
+import {selectUser, selectUsers, selectUsersLoading} from '../Users/usersSlice';
+import {useNavigate, useParams} from 'react-router-dom';
 
 const UserPhotos = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const params = useParams();
     const userPhotos = useAppSelector(selectUserImages);
     const isLoading = useAppSelector(selectUserIsLoading);
     const user = useAppSelector(selectUser);
+    const users = useAppSelector(selectUsers);
+    const usersIsLoading = useAppSelector(selectUsersLoading);
+
 
     useEffect(() => {
         const fetchUrl = async () => {
             if (params.id) await dispatch(getUserImages(params.id));
+            await dispatch(getUsers());
         };
 
         void fetchUrl();
-    }, [dispatch]);
+    }, [dispatch, params.id]);
 
     const deleteOnePhoto = async (id: string) => {
         await dispatch(deleteImages(id));
         if (params.id) await dispatch(getUserImages(params.id));
     };
+
+    const toForm = () => {
+        navigate('/addImage');
+    };
+
+    const getUserName = users.find(elem => elem._id === params.id);
 
     const userDeleteOnePhoto = async (id: string) => {
         await dispatch(userDeleteImage(id));
@@ -34,6 +45,8 @@ const UserPhotos = () => {
 
     return (
         <>
+            {user?._id === params.id && <Button onClick={toForm}>Add new photo</Button>}
+            {!usersIsLoading && getUserName ? <Typography component="div" variant="h4">{getUserName.displayName}</Typography> : <CircularProgress />}
             <Grid container spacing={3}>
                 {!isLoading ? userPhotos.map((elem) => (
                     <Grid item xs={3} key={elem._id}>

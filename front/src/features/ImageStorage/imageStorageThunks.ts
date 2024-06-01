@@ -1,6 +1,21 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {AllImages, ImagesStorageTypes} from '../../types';
+import {AllImages, ImagesStorageTypes, UserTypes} from '../../types';
 import axiosApi from '../../axiosApi';
+
+
+export const getUsers = createAsyncThunk<UserTypes[]>(
+    'get/images',
+    async () => {
+        const response = await axiosApi.get<UserTypes[]>('/users');
+        const items = response.data;
+
+        if (!items) {
+            return [];
+        }
+
+        return items;
+    },
+);
 
 export const getImages = createAsyncThunk<AllImages[]>(
     'get/images',
