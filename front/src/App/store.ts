@@ -2,16 +2,18 @@ import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {persistReducer, FLUSH, PAUSE, PERSIST, REHYDRATE, PURGE, REGISTER, persistStore} from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import {usersReducer} from '../features/Users/usersSlice';
+import {imagesReducer} from '../features/ImageStorage/imageStorageSlice';
 
 const usersPersistConfig = {
     key: 'music:users',
     storage: storage,
     whitelist: ['user'],
-};
+}
 
 const rootReducer = combineReducers({
     users: persistReducer(usersPersistConfig, usersReducer),
-});
+    photos: imagesReducer,
+})
 
 export const store = configureStore({
     reducer: rootReducer,

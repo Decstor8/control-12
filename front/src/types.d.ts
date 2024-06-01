@@ -39,3 +39,15 @@ export interface RegisterResponse {
     message: string;
     user: UserTypes;
 }
+
+export interface ImagesStorageTypes {
+    title: string;
+    image: string;
+}
+
+export interface AllPhotos {
+    _id: string;
+    user: string;
+    title: string;
+    image: string;
+}
