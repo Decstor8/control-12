@@ -1,16 +1,20 @@
-import {AllPhotos} from '../../types';
+import {AllImages} from '../../types';
 import {createSlice} from '@reduxjs/toolkit';
-import {getImages} from './imageStorageThunks';
+import {getImages, getUserImages} from './imageStorageThunks';
 import {RootState} from '../../App/store';
 
 interface ImageStorage {
-    photos: AllPhotos[],
+    images: AllImages[],
     isLoading: boolean,
+    userPhotos: AllImages[],
+    userIsLoading: boolean,
 }
 
 const initialState: ImageStorage = {
-    photos: [],
+    images: [],
     isLoading: false,
+    userPhotos: [],
+    userIsLoading: false,
 };
 
 export const imagesStorageSlice = createSlice({
@@ -23,14 +27,27 @@ export const imagesStorageSlice = createSlice({
         });
         builder.addCase(getImages.fulfilled, (state, {payload: items}) => {
             state.isLoading = false;
-            state.photos = items;
+            state.images = items;
         });
         builder.addCase(getImages.rejected, (state) => {
             state.isLoading = false;
+        });
+        builder.addCase(getUserImages.pending, (state) => {
+            state.userIsLoading = true;
+        });
+        builder.addCase(getUserImages.fulfilled, (state, {payload: items}) => {
+            state.userIsLoading = false;
+            state.userPhotos = items;
+        });
+        builder.addCase(getUserImages.rejected, (state) => {
+            state.userIsLoading = false;
         });
     },
 });
 
 export const imagesReducer = imagesStorageSlice.reducer;
-export const selectPhotos = (state: RootState) => state.photos.photos;
-export const selectIsLoading = (state: RootState) => state.photos.isLoading;
+export const selectImages = (state: RootState) => state.images.images;
+export const selectIsLoading = (state: RootState) => state.images.isLoading;
+export const selectUserImages = (state: RootState) => state.images.userPhotos;
+export const selectUserIsLoading = (state: RootState) => state.images.userIsLoading;
+

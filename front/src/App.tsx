@@ -8,6 +8,7 @@ import ImagesStorageForm from "./features/ImageStorage/ImageStorageForm";
 import {selectUser} from "./features/Users/usersSlice";
 import {useAppSelector} from "./App/hooks";
 import Images from "./features/ImageStorage/Image";
+import UserImages from "./features/ImageStorage/UserImages";
 
 function App() {
     const user = useAppSelector(selectUser);
@@ -19,7 +20,7 @@ function App() {
             </header>
             <Routes>
                 <Route path="/" element={<Images />} />
-                <Route path="/photos/:id" element={<div>Thats profile</div>} />
+                <Route path="/photos/:id" element={<UserImages />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/addPhoto" element={

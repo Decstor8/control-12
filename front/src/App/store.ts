@@ -8,12 +8,12 @@ const usersPersistConfig = {
     key: 'music:users',
     storage: storage,
     whitelist: ['user'],
-}
+};
 
 const rootReducer = combineReducers({
     users: persistReducer(usersPersistConfig, usersReducer),
-    photos: imagesReducer,
-})
+    images: imagesReducer,
+});
 
 export const store = configureStore({
     reducer: rootReducer,

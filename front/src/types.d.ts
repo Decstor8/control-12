@@ -45,9 +45,12 @@ export interface ImagesStorageTypes {
     image: string;
 }
 
-export interface AllPhotos {
+export interface AllImages {
     _id: string;
-    user: string;
+    user: {
+        _id: string;
+        displayName: string;
+    };
     title: string;
     image: string;
 }

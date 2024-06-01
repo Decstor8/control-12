@@ -9,9 +9,13 @@ const imageStorageRouter = Router();
 
 imageStorageRouter.get('/', async (_req, res, next) => {
     try {
-        const photos = await PhotoGallery.find();
+        const images = await PhotoGallery.find().populate(
+            {
+                path: 'user',
+                select: '_id displayName'
+            });
 
-        return res.send(photos);
+        return res.send(images);
     } catch (err) {
         return next(err);
     }
@@ -24,16 +28,23 @@ imageStorageRouter.get('/:id', async (req, res, next) => {
         try {
             _id = new Types.ObjectId(req.params.id);
         } catch {
-            return res.status(422).send({error: 'Wrong objectId!'});
+            return res.status(422).send({error: 'Неправильный идентификатор!'});
         }
 
-        const photos = await PhotoGallery.find({user: _id});
+        const images = await PhotoGallery.find(
+            {
+                user: _id
+            }).populate(
+                {
+                    path: 'user',
+                    select: '_id displayName'
+                });
 
-        if (!photos) {
-            return res.status(422).send({error: 'Not found!'});
+        if (!images) {
+            return res.status(422).send({error: 'Не найдено!'});
         }
 
-        return res.send(photos);
+        return res.send(images);
     } catch (err) {
         return next(err);
     }
@@ -62,16 +73,16 @@ imageStorageRouter.delete('/:id', auth, permit('admin'), async (req, res, next) 
         try {
             _id = new Types.ObjectId(req.params.id);
         } catch {
-            return res.status(422).send({error: 'Wrong objectId!'});
+            return res.status(422).send({error: 'Неправильный идентификатор'});
         }
 
         const deleteOnePhoto = await PhotoGallery.findByIdAndDelete(_id);
 
         if (!deleteOnePhoto) {
-            return res.status(422).send({error: 'Not found!'});
+            return res.status(422).send({error: 'Не найдено!'});
         }
 
-        return res.send({message: 'One photo deleted'});
+        return res.send({message: 'Одно фото удалено!'});
     } catch (err) {
         return next(err);
     }
@@ -84,16 +95,16 @@ imageStorageRouter.delete('/', auth, async (req: RequestWithUser, res, next) => 
         const photo = await PhotoGallery.findById(photoId);
 
         if (!photo) {
-            return res.status(404).send({error: 'Photo not found'});
+            return res.status(404).send({error: 'Фото не найдено'});
         }
 
         if (photo.user.toString() !== req.user?._id.toString()) {
-            return res.status(403).send({error: 'Access denied!!'});
+            return res.status(403).send({error: 'Доступ запрещен :('});
         }
 
         await PhotoGallery.findByIdAndDelete(photoId);
 
-        return res.send({message: 'One photo deleted'});
+        return res.send({message: 'Одно фото удалено!'});
 
     } catch (err) {
         return next(err);
